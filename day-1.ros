@@ -1,0 +1,44 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(alexandria serapeum uiop) :silent t)
+  )
+
+(defpackage :ros.script.day-1.3942393513
+  (:use :cl))
+(in-package :ros.script.day-1.3942393513)
+
+(defun extract-lines (lines)
+  (serapeum:mvlet ((left right (serapeum:with-collectors (left right)
+                                 (dolist (line lines)
+                                   (let ((split (uiop:split-string line)))
+                                     (left (parse-integer (first split)))
+                                     (right (parse-integer (car (last split) ))))))))
+    (values left right)))
+
+(defun part-1 (lines)
+  (serapeum:mvlet ((left right (extract-lines lines)))
+    (serapeum:summing
+      (loop for l in (sort left #'<)
+            for r in (sort right #'<)
+            do (sum (abs (- l r)))))))
+
+(defun part-2 (lines)
+  (serapeum:mvlet ((left right (extract-lines lines)))
+    (serapeum:summing
+      (loop for l in (sort left #'<)
+            do (sum (* l (count l right)))))))
+
+(defun main (&rest argv)
+  (format t "day 1 part 1: ~a~%day 1 part 2: ~a"
+          (part-1 (uiop:read-file-lines (car argv)))
+          (part-2 (uiop:read-file-lines (car argv)))))
+
+;; (main "day-1.test")
+;; => 11
+
+;;; vim: set ft=lisp lisp:
