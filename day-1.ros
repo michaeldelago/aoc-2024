@@ -40,5 +40,6 @@ exec ros -Q -- $0 "$@"
 
 ;; (main "day-1.test")
 ;; => 11
+;; => 31
 
 ;;; vim: set ft=lisp lisp:
