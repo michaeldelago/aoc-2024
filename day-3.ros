@@ -1,0 +1,37 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp(ql:quickload '(serapeum cl-ppcre) :silent t)
+  )
+
+(defpackage :ros.script.day-3.3943298519
+  (:use :cl))
+(in-package :ros.script.day-3.3943298519)
+
+(defun part-1 (lines)
+  (serapeum:summing (cl-ppcre:do-register-groups ((#'parse-integer x y))
+                        ("mul\\((\\d+),(\\d+)\\)" (apply #'concatenate 'string lines))
+                      (sum (* x y)))))
+
+(defun part-2 (lines)
+  (let (disabled)
+    (serapeum:summing (cl-ppcre:do-register-groups (grp dofn dont (#'parse-integer x y))
+                          ("((do\\(\\))|(don't\\(\\))|mul\\((\\d+),(\\d+)\\))" (apply #'concatenate 'string lines))
+                        (format t "~a ~a ~a ~a ~a~&" grp dofn dont x y)
+                        (cond
+                          (dofn (setf disabled nil))
+                          (dont (setf disabled t))
+                          ((and (not disabled) x y)
+                           (sum (* x y))
+                           (format t "+ ~a ~&" (* x y))))))))
+
+(defun main (&rest argv)
+  (format t "day 2 part 1: ~a~%day 2 part 2: ~a~%"
+          (part-1 (uiop:read-file-lines (car argv)))
+          (part-2 (uiop:read-file-lines (car argv)))))
+
+;;; vim: set ft=lisp lisp:
